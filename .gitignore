@@ -18,8 +18,8 @@ bin/log
 **.DS_Store
 */**/.DS_Store
 
-#config/database.yml
-#config/deploy.rb
-#config/environments/development.rb
-#config/environments/production.rb
-#config/initializers/exception_notifier.rb
+config/database.yml
+config/deploy.rb
+config/environments/development.rb
+config/environments/production.rb
+config/initializers/exception_notifier.rb
