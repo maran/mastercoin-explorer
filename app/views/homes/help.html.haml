@@ -1,0 +1,13 @@
+.row
+  .col-md-12
+    %h3 Broadcasting a raw transaction via the reference client
+    %ul
+      %li Open the Bitcoin client and navigate to help->debug window and press on the 'console' tab
+      %li First we will verify the transaction. Type decoderawtransaction and paste the raw transaction string you got.
+      %li Make sure the values are correct and check that at the bottom your Mastercoin address is visible also make sure it doesn't say '"type" : "nonstandard"' somewhere. In the future we will make sure the Mastercoin data itself is encoded correctly as well. But for now these are the checks you should do.
+      %li If you are happy with the result sign the transaction using your private key. Begin by unlocking your wallet; type walletpassphrase <mypassword> 15. This will unlock your wallet for 15 seconds.
+      %li Type signrawtransaction and paste the raw transaction string in again.
+      %li If all goes well you should see something that says: {hex: <stuffhere>, completed: true}. Copy the part after hex.
+      %li Broadcast the transaction over the network by typing sendrawtransaction and paste in the latest string.
+      %li If all went well you should have gotten the transaction hash as output.
+

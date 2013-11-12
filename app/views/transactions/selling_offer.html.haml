@@ -1,0 +1,61 @@
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Basic Information
+      %table.table
+        %tr
+          %th From
+          %td=link_to @transaction.address, address_path(@transaction.address)
+        %tr
+          %th Price per coin
+          %td=@transaction.price_per_coin
+        %tr
+          %th Amount
+          %td=@transaction.amount
+        %tr
+          %th Bitcoin amount desired
+          %td=@transaction.amount_desired
+        %tr
+          %th Fee required
+          %td=@transaction.required_fee
+        %tr
+          %th Block time limit
+          %td=@transaction.time_limit
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Information
+      %table.table
+        %tr
+          %th Currency
+          %td=@transaction.currency
+        %tr
+          %th Transaction type
+          %td Selling Offer
+        %tr
+          %th Block time
+          %td=@transaction.tx_date
+        %tr
+          %th Valid
+          %td=raw valid_label(@transaction)
+        %tr
+          %th Position
+          %td=@transaction.position
+        %tr
+          %th Is multisig Mastercoin
+          %td=@transaction.multi_sig? ? "Yes" : "No"
+
+-if @transaction.purchase_offers.any?
+  .row
+    .col-md-12
+      .panel.panel-default
+        .panel-heading Bids on this offer
+        %table.table
+          %tr
+            %th Amount
+            %th Status
+            %th Date
+          -@transaction.purchase_offers.each do |offer|
+            %tr
+              %td=offer.amount
+              %td=offer.status_text
+              %td=offer.tx_date

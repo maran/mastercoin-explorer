@@ -1,0 +1,15 @@
+.row
+  .col-md-6
+    %h2 
+      Building
+      %small new selling offer
+    = simple_form_for(@selling_offer) do |f|
+      = f.input :public_key, placeholder: "My Mastercoin public key", input_html: {class: "form-control"}, hint: "You can get your public key by using validateaddress in the bitcoin-qt console"
+      = f.input :amount, placeholder: "Total amount of MSC to sell", input_html: {class: "form-control"}
+      = f.input :amount_desired, placeholder: "Total amount of Bitcoin", input_html: {class: "form-control"}
+      = f.input :time_limit, placeholder: "Time allowed in blocks", input_html: {class: "form-control"}
+      = f.input :required_fee, placeholder: "Required fee for offers", input_html: {class: "form-control"}
+      = f.input :currency_id, as: :select, collection: [["Test Mastercoin",2]], input_html: {class: "form-control"}
+      %br/
+      %br/
+      = f.submit "Create raw transaction", class: "btn btn-primary"

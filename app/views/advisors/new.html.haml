@@ -1,0 +1,14 @@
+.row
+  .col-md-6
+    %h2 
+      Builder 
+      %small new Simple Send
+    = simple_form_for(@advisor) do |f|
+      = f.input :public_key, placeholder: "My Mastercoin public key", input_html: {class: "form-control"}, hint: "You can get your public key by using validateaddress in the bitcoin-qt console"
+      = f.input :amount, placeholder: "Amount to send", input_html: {class: "form-control"}
+      = f.input :receiving_address, placeholder: "Receiving address", input_html: {class: "form-control"}
+      = f.input :transaction_type, as: :select, collection: [["Simple send",0]], input_html: {class: "form-control"}
+      = f.input :currency_id, as: :select, collection: [["Mastercoin",1], ["Test Mastercoin",2]], input_html: {class: "form-control"}
+      %br/
+      %br/
+      = f.submit "Advise", class: "btn btn-primary"

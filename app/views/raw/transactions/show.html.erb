@@ -1,0 +1,30 @@
+<h1>Transaction information</h1>
+<p>Please note that this only shows the raw transaction data encoded. It does not tell wether or not the coins were actually owned by the person sending them.</p>
+<div class="alert alert-success"><%= @transaction.to_s %></div>
+<% if @transaction.data_addresses.any? %>
+<div class="panel panel-default">
+  <div class="panel-heading">Raw information</div>
+
+  <table class="table">
+    <thead>
+      <th>Transaction type</th>
+      <th>Currency id</th>
+      <th>Amount</th>
+      <th>Sequence</th>
+    </thead>
+    <tbody>
+      <% @transaction.data_addresses.each do |da| %>
+        <tr>
+          <td><%= da.transaction_type %></td>
+          <td><%= da.currency_id %></td>
+          <td><%= da.amount %></td>
+          <td><%= da.sequence %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+<% end %>
+<% content_for :title do %>
+  Mastercoin transaction information for <%= params[:id] %>
+<% end %>

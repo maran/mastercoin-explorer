@@ -1,0 +1,226 @@
+GIT
+  remote: git://github.com/seyhunak/twitter-bootstrap-rails.git
+  revision: fd202fc8f986debdf7ab9ef6bece6c04fa559903
+  branch: bootstrap3
+  specs:
+    twitter-bootstrap-rails (2.2.7)
+      actionpack (>= 3.1)
+      execjs
+      rails (>= 3.1)
+      railties (>= 3.1)
+
+GIT
+  remote: https://github.com/lian/bitcoin-ruby.git
+  revision: d309506f5910de60c72d425b47ea36f8e83597c1
+  specs:
+    bitcoin-ruby (0.0.2)
+
+GIT
+  remote: https://github.com/maran/mastercoin-ruby.git
+  revision: 9f30497d32326182ec6ec28e7321b1bc51ad80b7
+  branch: develop
+  specs:
+    mastercoin-ruby (0.0.4)
+      activesupport (>= 3.0.0)
+      bitcoin-ruby (~> 0.0.1)
+      sequel (~> 4.1.1)
+      thor
+
+GIT
+  remote: https://github.com/smartinez87/exception_notification.git
+  revision: 9eda7885682b2e3ab1e6e6bc53e8157ce65d9fb4
+  specs:
+    exception_notification (4.0.1)
+      actionmailer (>= 3.0.4)
+      activesupport (>= 3.0.4)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    actionmailer (4.0.0)
+      actionpack (= 4.0.0)
+      mail (~> 2.5.3)
+    actionpack (4.0.0)
+      activesupport (= 4.0.0)
+      builder (~> 3.1.0)
+      erubis (~> 2.7.0)
+      rack (~> 1.5.2)
+      rack-test (~> 0.6.2)
+    activemodel (4.0.0)
+      activesupport (= 4.0.0)
+      builder (~> 3.1.0)
+    activerecord (4.0.0)
+      activemodel (= 4.0.0)
+      activerecord-deprecated_finders (~> 1.0.2)
+      activesupport (= 4.0.0)
+      arel (~> 4.0.0)
+    activerecord-deprecated_finders (1.0.3)
+    activesupport (4.0.0)
+      i18n (~> 0.6, >= 0.6.4)
+      minitest (~> 4.2)
+      multi_json (~> 1.3)
+      thread_safe (~> 0.1)
+      tzinfo (~> 0.3.37)
+    acts_as_list (0.3.0)
+      activerecord (>= 3.0)
+    arel (4.0.0)
+    atomic (1.1.14)
+    builder (3.1.4)
+    capistrano (2.15.5)
+      highline
+      net-scp (>= 1.0.0)
+      net-sftp (>= 2.0.0)
+      net-ssh (>= 2.0.14)
+      net-ssh-gateway (>= 1.1.0)
+    coffee-rails (4.0.0)
+      coffee-script (>= 2.2.0)
+      railties (>= 4.0.0.beta, < 5.0)
+    coffee-script (2.2.0)
+      coffee-script-source
+      execjs
+    coffee-script-source (1.6.3)
+    database_cleaner (1.0.1)
+    diff-lcs (1.1.3)
+    erubis (2.7.0)
+    eventmachine (1.0.1)
+    execjs (2.0.1)
+    factory_girl (4.2.0)
+      activesupport (>= 3.0.0)
+    factory_girl_rails (4.2.1)
+      factory_girl (~> 4.2.0)
+      railties (>= 3.0.0)
+    haml (4.0.3)
+      tilt
+    highline (1.6.19)
+    hike (1.2.3)
+    i18n (0.6.5)
+    jbuilder (1.5.1)
+      activesupport (>= 3.0.0)
+      multi_json (>= 1.2.0)
+    jquery-rails (3.0.4)
+      railties (>= 3.0, < 5.0)
+      thor (>= 0.14, < 2.0)
+    json (1.8.0)
+    kaminari (0.14.1)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
+    libv8 (3.11.8.13)
+    mail (2.5.4)
+      mime-types (~> 1.16)
+      treetop (~> 1.4.8)
+    mime-types (1.25)
+    minitest (4.7.5)
+    multi_json (1.8.2)
+    net-scp (1.1.2)
+      net-ssh (>= 2.6.5)
+    net-sftp (2.1.2)
+      net-ssh (>= 2.6.5)
+    net-ssh (2.6.8)
+    net-ssh-gateway (1.2.0)
+      net-ssh (>= 2.6.5)
+    pg (0.15.1)
+    polyglot (0.3.3)
+    rack (1.5.2)
+    rack-test (0.6.2)
+      rack (>= 1.0)
+    rails (4.0.0)
+      actionmailer (= 4.0.0)
+      actionpack (= 4.0.0)
+      activerecord (= 4.0.0)
+      activesupport (= 4.0.0)
+      bundler (>= 1.3.0, < 2.0)
+      railties (= 4.0.0)
+      sprockets-rails (~> 2.0.0)
+    railties (4.0.0)
+      actionpack (= 4.0.0)
+      activesupport (= 4.0.0)
+      rake (>= 0.8.7)
+      thor (>= 0.18.1, < 2.0)
+    rake (10.1.0)
+    rdoc (3.12.2)
+      json (~> 1.4)
+    ref (1.0.2)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
+    rspec (2.11.0)
+      rspec-core (~> 2.11.0)
+      rspec-expectations (~> 2.11.0)
+      rspec-mocks (~> 2.11.0)
+    rspec-core (2.11.1)
+    rspec-expectations (2.11.3)
+      diff-lcs (~> 1.1.3)
+    rspec-mocks (2.11.3)
+    rspec-rails (2.11.4)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      railties (>= 3.0)
+      rspec (~> 2.11.0)
+    rvm-capistrano (1.4.4)
+      capistrano (>= 2.15.4)
+    sass (3.2.10)
+    sass-rails (4.0.0)
+      railties (>= 4.0.0.beta, < 5.0)
+      sass (>= 3.1.10)
+      sprockets-rails (~> 2.0.0)
+    sdoc (0.3.20)
+      json (>= 1.1.3)
+      rdoc (~> 3.10)
+    sequel (4.1.1)
+    simple_form (1.4.1)
+    sprockets (2.10.0)
+      hike (~> 1.2)
+      multi_json (~> 1.0)
+      rack (~> 1.0)
+      tilt (~> 1.1, != 1.3.0)
+    sprockets-rails (2.0.0)
+      actionpack (>= 3.0)
+      activesupport (>= 3.0)
+      sprockets (~> 2.8)
+    sqlite3 (1.3.8)
+    therubyracer (0.11.4)
+      libv8 (~> 3.11.8.12)
+      ref
+    thor (0.18.1)
+    thread_safe (0.1.3)
+      atomic
+    tilt (1.4.1)
+    treetop (1.4.15)
+      polyglot
+      polyglot (>= 0.3.1)
+    turbolinks (1.3.0)
+      coffee-rails
+    tzinfo (0.3.38)
+    uglifier (2.2.1)
+      execjs (>= 0.3.0)
+      multi_json (~> 1.0, >= 1.0.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  acts_as_list
+  bitcoin-ruby (~> 0.0.2)!
+  coffee-rails (~> 4.0.0)
+  database_cleaner (< 1.1.0)
+  eventmachine (= 1.0.1)
+  exception_notification (= 4.0.1)!
+  factory_girl_rails (~> 4.0)
+  haml (~> 4.0)
+  jbuilder (~> 1.2)
+  jquery-rails
+  kaminari
+  mastercoin-ruby!
+  pg
+  rails (= 4.0.0)
+  rest-client
+  rspec-rails (~> 2.0)
+  rvm-capistrano
+  sass-rails (~> 4.0.0)
+  sdoc
+  sequel
+  simple_form
+  sqlite3
+  therubyracer
+  turbolinks
+  twitter-bootstrap-rails!
+  uglifier (>= 1.3.0)

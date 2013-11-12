@@ -1,0 +1,43 @@
+%h2
+  Transaction information
+  %small=params[:id]
+
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Basic Information
+      %table.table
+        %tr
+          %th From
+          %td=link_to @transaction.address, address_path(@transaction.address)
+        %tr
+          %th To
+          %td=link_to @transaction.receiving_address, address_path(@transaction.receiving_address)
+        %tr
+          %th Amount
+          %td=@transaction.amount
+        %tr
+          %th Included in block
+          %td=@transaction.block_height
+        %tr
+          %th Block time
+          %td=@transaction.tx_date
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Information
+      %table.table
+        %tr
+          %th Currency
+          %td=@transaction.currency
+        %tr
+          %th Transaction type
+          %td Simple send
+        %tr
+          %th Valid
+          %td=raw valid_label(@transaction)
+        %tr
+          %th Position
+          %td=@transaction.position
+        %tr
+          %th Is multisig Mastercoin
+          %td=@transaction.multi_sig? ? "Yes" : "No"

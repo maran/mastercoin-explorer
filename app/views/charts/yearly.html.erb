@@ -1,0 +1,46 @@
+<div id="container" style="width:100%; height:400px;">
+
+  <script>
+    $(function () {
+      $('#container').highcharts({
+          chart: {
+                type: 'column'
+          },
+          title: {
+              text: 'Yearly Mastercoin Transactions',
+              x: -20 //center
+          },
+          subtitle: {
+            text: 'Simple send transactions excluding test coins',
+              x: -20
+          },
+          xAxis: {
+              categories: <%= raw SimpleSend.collect_yearly_date.to_json %>
+          },
+          yAxis: {
+              title: {
+                  text: 'Amount transferred'
+              },
+              plotLines: [{
+                  value: 0,
+                  width: 1,
+                  color: '#808080'
+              }]
+          },
+          tooltip: {
+            formatter: function() {
+              return 'Amount transferred on ' + this.x + ' is  MSC ' + Math.round(this.y * 100000000) /  100000000;
+            }
+          },
+          legend: {
+              layout: 'vertical',
+              align: 'right',
+              verticalAlign: 'middle',
+              borderWidth: 0
+          },
+          series: [ <%= raw SimpleSend.collect_yearly_chart_data.to_json %> ]
+	    });
+		});
+  </script>
+</div>
+

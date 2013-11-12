@@ -1,0 +1,77 @@
+%h1 API Documentation
+
+%h3 Getting address details
+.highlight
+  %pre
+    %code
+      http://mastercoin-explorer.com/api/v1/addresses/17uK6u4nTbWv3h6WNKg7ejxmgXvy4qebBY.json
+
+  %pre
+    %code
+      \{
+      \  "address":"17uK6u4nTbWv3h6WNKg7ejxmgXvy4qebBY",
+      \  "sent_transactions":[],
+      \  "received_transactions":[],
+      \  "exodus_transactions":[
+      \    {
+      \        "address":"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P",
+      \        "receiving_address":"17uK6u4nTbWv3h6WNKg7ejxmgXvy4qebBY",
+      \        "transaction_type":-1,
+      \        "currency_id":1,
+      \        "tx_id":"a2421fa6c90e253bcf6d2a3e7cb7740fbabb2bee51b5d07031ad1935b4990a19",
+      \        "tx_date":"2013-08-26T21:21:58.000Z",
+      \        "block_height":255916,
+      \        "amount":"0.00643798",
+      \        "bonus_amount_included":"0.00043798",
+      \        "invalid_tx":false,
+      \        "position":191,
+      \        "multi_sig":false
+      \   },
+      \  ],
+      \  "balance":"0.00643798",
+      \  "test_balance":"0.00643798"
+      \}
+
+%h3 Getting transaction details
+.highlight
+  %pre
+    %code
+      http://mastercoin-explorer.com/api/v1/transactions/a2421fa6c90e253bcf6d2a3e7cb7740fbabb2bee51b5d07031ad1935b4990a19.json
+
+  %pre
+    %code
+      \{
+      \ "address":"1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P",
+      \ "receiving_address":"17uK6u4nTbWv3h6WNKg7ejxmgXvy4qebBY",
+      \ "transaction_type":-1,
+      \ "currency_id":1,
+      \ "tx_id":"a2421fa6c90e253bcf6d2a3e7cb7740fbabb2bee51b5d07031ad1935b4990a19",
+      \ "tx_date":"2013-08-26T21:21:58.000Z",
+      \ "block_height":255916,
+      \ "amount":"0.00643798",
+      \ "bonus_amount_included":"0.00043798",
+      \ "invalid_tx":false,
+      \ "position":191,
+      \ "multi_sig":false
+      \}
+  %p Retrieving all transactions
+  %pre
+    %code http://mastercoin-explorer.com/api/v1/transactions.json
+  %p Retrieving invalid transactions
+  %pre
+    %code http://mastercoin-explorer.com/api/v1/transactions/invalid.json
+  %p Retrieving simple send transactions
+  %pre
+    %code http://mastercoin-explorer.com/api/v1/transactions/simple_send.json
+  %p Retrieving Exodus payments
+  %pre
+    %code http://mastercoin-explorer.com/api/v1/transactions/exodus.json
+  %p Retrieving selling offers
+  %pre
+    %code http://mastercoin-explorer.com/api/v1/selling_offers.json
+  %p Retrieving purchase offers
+  %pre
+    %code http://mastercoin-explorer.com/api/v1/purchase_offers.json
+  %p Record sets are shown per 10 you can add &page=2 to the url to retrieve the next set of records
+  %pre
+    %code http://mastercoin-explorer.com/api/v1/transactions.json?page=2

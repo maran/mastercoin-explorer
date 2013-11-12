@@ -1,0 +1,57 @@
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Purchase offer information
+      %table.table
+        %tr
+          %th From
+          %td=link_to @transaction.address, address_path(@transaction.address)
+        %tr
+          %th Amount requested
+          %td=@transaction.amount
+        %tr
+          %th Amount accepted
+          %td=@transaction.accepted_amount
+        %tr
+          %th Currency
+          %td=@transaction.currency
+        %tr
+          %th Status
+          %td
+            %span{class: "label label-#{@transaction.status_class}"}=@transaction.status_text
+        %tr
+          %th Bitcoin required
+          %td= @transaction.bitcoins_required
+  .col-md-6
+    .panel.panel-default
+      .panel-heading General information
+      %table.table
+        %tr
+          %th Block time
+          %td=@transaction.tx_date
+        %tr
+          %th Valid
+          %td=raw valid_label(@transaction)
+        %tr
+          %th Position
+          %td=@transaction.position
+        %tr
+          %th Is multisig Mastercoin
+          %td=@transaction.multi_sig? ? "Yes" : "No"
+
+-if @transaction.selling_offer.present?
+  .row
+    .col-md-12
+      .panel.panel-default
+        .panel-heading Selling offer
+        %table.table
+          %tr
+            %th From
+            %th Price per coin
+            %th Amount
+            %th Date
+          %tr
+            %td=@transaction.selling_offer.address
+            %td=@transaction.selling_offer.price_per_coin
+            %td=@transaction.selling_offer.amount
+            %td=@transaction.selling_offer.tx_date

@@ -1,0 +1,118 @@
+%h1
+  Address information 
+  %small=@address.address
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Balance information
+      %table.table
+        %tr
+          %th &nbsp;
+          %th Mastercoin
+          %th Test Mastercoin
+        %tr
+          %th Final balance
+          %td
+            = number_to_currency(@address.balance(1), unit: "")
+          %td 
+            =number_to_currency(@address.balance(2), unit: "")
+        %tr
+          %th Bought via Exodus
+          %td=@address.exodus_payments(1).sum(:amount)
+          %td=@address.exodus_payments(2).sum(:amount)
+        %tr
+          %th Payments received
+          %td= @address.received(1).sum(:amount)
+          %td= @address.received(2).sum(:amount)
+        %tr
+          %th Payments sent
+          %td= @address.sent(1).sum(:amount)
+          %td= @address.sent(2).sum(:amount)
+        %tr
+          %th Coins bought
+          %td= @address.bought(1).sum(:amount)
+          %td= @address.bought(2).sum(:amount)
+        %tr
+          %th Coins sold
+          %td= @address.sold(1).sum(:amount)
+          %td= @address.sold(2).sum(:amount)
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Other information
+      %table.table
+        %tr
+          %th &nbsp;
+          %th Mastercoin
+          %th Test Mastercoin
+        %tr
+          %th Exodus transactions
+          %td
+            %span.badge= @address.exodus_payments(1).count
+          %td
+            %span.badge= @address.exodus_payments(2).count
+        %tr
+          %th Incoming transactions
+          %td
+            %span.badge= @address.received(1).count
+          %td
+            %span.badge= @address.received(2).count
+        %tr
+          %th Outoing transactions
+          %td
+            %span.badge= @address.sent(1).count
+          %td
+            %span.badge= @address.sent(2).count
+
+-if @exodus_payments.present?
+  .panel.panel-default
+    .panel-heading 
+      Exodus transactions
+      ="(#{@exodus_payments.count})"
+    %table.table
+      %thead
+        %th Transaction ID
+        %th Currency
+        %th Amount
+        %th Bonus
+        %th Date
+      -@exodus_payments.each do |payment|
+        %tr
+          %td=link_to truncate(payment.tx_id, length: 15), transaction_path(payment.tx_id)
+          %td=payment.currency
+          %td=payment.amount
+          %td=payment.bonus_amount_included
+          %td=l payment.tx_date rescue Date.parse(payment.tx_date)
+-if @address.sold.present?
+  .panel.panel-default
+    .panel-heading 
+      Sold coins
+      ="(#{@address.sold.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @address.sold}
+-if @address.bought.present?
+  .panel.panel-default
+    .panel-heading 
+      Bought coins
+      ="(#{@address.bought.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @address.bought}
+
+-if @selling_offers.present?
+  .panel.panel-default
+    .panel-heading 
+      Selling Offers
+      ="(#{@selling_offers.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @selling_offers}
+
+-if @received_payments.present?
+  .panel.panel-default
+    .panel-heading 
+      Received transactions
+      ="(#{@received_payments.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @received_payments, short: false}
+
+-if @sent.present?
+  .panel.panel-default
+    .panel-heading
+      Sent transactions
+      ="(#{@sent.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @sent, short: false}
+

@@ -1,0 +1,7 @@
+.row
+  .col-md-6
+    %h3 Decode mastercoin transaction
+    %p Decode a Bitcoin transaction hash and see if it contains a mastercoin transaction.
+    %form{:action => "/raw/transactions", :method => "get"}
+      %input{:name => "id", :placeholder => "Bitcoin transaction"}/
+      = submit_tag "Decode transaction", class: "btn btn-primary"

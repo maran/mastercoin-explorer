@@ -1,0 +1,7 @@
+%h2 Purchase offer
+%p Your transaction has been build. You can now use your private key from your client to sign the transaction.
+%p Always decode the transaction first to make sure the transaction is created the way you wanted it.
+%p Please note that after you send this purchase offer and it's accepted by the site you will have to send the proper amount in Bitcoin from your MasterCoin address. Make sure your address is funded and that you send the coins from this address.
+%textarea{style: "width:100%; height: 150px"}=@purchase_offer.transaction_hash
+
+%p=link_to "Need help broadcasting this transaction?", "/help"

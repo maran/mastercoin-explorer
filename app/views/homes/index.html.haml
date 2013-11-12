@@ -1,0 +1,26 @@
+.row
+  .col-md-12
+    %h2 Latest Mastercoin transactions
+    =render partial: "/transactions/transactions", locals: {transactions: @transactions }
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Mastercoin information
+      %table.table
+        %tr
+          %th Total transactions
+          %td= Transaction.valid.count
+        %tr
+          %th Total Mastercoins sent
+          %td= SimpleSend.valid.sum(:amount)
+        %tr
+          %th Total bought via Exodus
+          %td= number_to_currency(ExodusTransaction.where(currency_id: 1).sum(:amount), unit: "MSC ")
+  .col-md-6
+    .panel.panel-info
+      .panel-heading About Mastercoin explorer
+      .panel-body
+        %p 
+          Mastercoin-explorer.com parses the Bitcoin blockchain looking for transactions that follow the rules set out by 
+          =link_to "the Mastercoin protocol.", "https://bitcointalk.org/index.php?topic=265488.0"
+          Everything you see here is pretty much a work in progress.

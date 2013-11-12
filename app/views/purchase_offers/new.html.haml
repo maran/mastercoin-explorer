@@ -1,0 +1,14 @@
+.row
+  .col-md-6
+    %h2 
+      Building
+      %small new purchase offer
+    = simple_form_for(@purchase_offer) do |f|
+      = f.input :public_key, placeholder: "My Mastercoin public key", input_html: {class: "form-control"}, hint: "You can get your public key by using validateaddress in the bitcoin-qt console"
+      = f.input :receiving_address, placeholder: "The MSC address of the offer you want to accept", input_html: {class: "form-control"}
+      = f.input :amount, placeholder: "Amount of MSC to buy", input_html: {class: "form-control"}
+      = f.input :forced_fee,label: "Required fee for Offer",  placeholder: "Required transaction fee", input_html: {class: "form-control"}
+      = f.input :currency_id, as: :select, collection: [["Test Mastercoin",2]], input_html: {class: "form-control"}
+      %br/
+      %br/
+      = f.submit "Create raw transaction", class: "btn btn-primary"

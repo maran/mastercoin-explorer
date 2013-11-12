@@ -1,0 +1,15 @@
+.panel.panel-default
+  .panel-heading 
+    Top 50 highest balances
+  .panel-body
+    %p This shows an approximation of the 'richest' Mastercoin addresses. All the details are by approximation.
+  %table.table-condensed.table
+    %tr
+      %th Address
+      %th Balance
+      %th Percentage
+    -@all_addresses.each do |address|
+      %tr
+        %td=link_to address[0], address_path(address[0])
+        %td=address[1]
+        %td="#{address[2]}%"
