@@ -1,7 +1,36 @@
 .row
   .col-md-12
     %h2 Latest Mastercoin transactions
-    =render partial: "/transactions/transactions", locals: {transactions: @transactions }
+    %table.table.table-condensed
+      %thead
+        %th
+        %th Source
+        %th Recipient
+        %th Currency
+        %th Amount
+        %th Type
+        %th Block time
+        %th Status
+      -@transactions.each do |payment|
+        %tr
+          %td
+            =link_to image_tag('details.png'), transaction_path(payment.tx_id), :"data-toggle" => :tooltip, title: payment.tx_id, class: "transaction-tooltip", :"data-placement" => "right"
+          %td=link_to payment.address, address_path(payment.address)
+          -if payment.type == "SellingOffer"
+            %td Not available
+          -else
+            %td=link_to payment.receiving_address, address_path(payment.receiving_address)
+
+          %td=payment.currency
+          %td=payment.amount
+          %td=payment.kind
+          -if 12.hours.ago > payment.tx_date
+            %td=l(payment.tx_date, format: :short) rescue Date.parse(payment.tx_date)
+          -else
+            %td
+              =distance_of_time_in_words_to_now(payment.tx_date)
+              ago
+          %td=raw valid_label(payment)
 .row
   .col-md-6
     .panel.panel-default
@@ -16,11 +45,12 @@
         %tr
           %th Total bought via Exodus
           %td= number_to_currency(ExodusTransaction.where(currency_id: 1).sum(:amount), unit: "MSC ")
+        %tr
+          %th Latest block
+          %td=Mastercoin.storage.get_depth
   .col-md-6
-    .panel.panel-info
-      .panel-heading About Mastercoin explorer
+    .panel.panel-default
+      .panel-heading Advertisment
       .panel-body
-        %p 
-          Mastercoin-explorer.com parses the Bitcoin blockchain looking for transactions that follow the rules set out by 
-          =link_to "the Mastercoin protocol.", "https://bitcointalk.org/index.php?topic=265488.0"
-          Everything you see here is pretty much a work in progress.
+        %center
+          =link_to image_tag("banner.png",height:120), "http://www.getmastercoin.com/"

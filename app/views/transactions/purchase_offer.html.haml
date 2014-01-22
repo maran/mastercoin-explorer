@@ -1,3 +1,7 @@
+%h2 
+  Purchase Offer information
+  %small=params[:id]
+  
 .row
   .col-md-6
     .panel.panel-default
@@ -6,12 +10,19 @@
         %tr
           %th From
           %td=link_to @transaction.address, address_path(@transaction.address)
-        %tr
-          %th Amount requested
-          %td=@transaction.amount
-        %tr
-          %th Amount accepted
-          %td=@transaction.accepted_amount
+        -if @transaction.selling_offer.present?
+          %tr
+            %th Amount requested
+            %td=number_to_currency(@transaction.requested_amount)
+          %tr
+            %th Amount accepted
+            %td=number_to_currency(@transaction.accepted_amount)
+          %tr
+            %th Amount bought
+            %td=number_to_currency(@transaction.amount)
+          %tr
+            %th Bitcoin required
+            %td=number_to_currency(@transaction.bitcoins_required, unit: "฿")
         %tr
           %th Currency
           %td=@transaction.currency
@@ -19,13 +30,13 @@
           %th Status
           %td
             %span{class: "label label-#{@transaction.status_class}"}=@transaction.status_text
-        %tr
-          %th Bitcoin required
-          %td= @transaction.bitcoins_required
   .col-md-6
     .panel.panel-default
       .panel-heading General information
       %table.table
+        %tr
+          %th Block height
+          %td=@transaction.block_height
         %tr
           %th Block time
           %td=@transaction.tx_date
@@ -47,11 +58,31 @@
         %table.table
           %tr
             %th From
+            %th Transaction
             %th Price per coin
             %th Amount
             %th Date
           %tr
-            %td=@transaction.selling_offer.address
+            %td=link_to @transaction.selling_offer.address, address_path(@transaction.selling_offer.address)
+            %td=link_to truncate(@transaction.selling_offer.tx_id), transaction_path(@transaction.selling_offer.tx_id)
             %td=@transaction.selling_offer.price_per_coin
             %td=@transaction.selling_offer.amount
             %td=@transaction.selling_offer.tx_date
+-if @transaction.reference_transactions.present?
+  .row
+    .col-md-12
+      .panel.panel-default
+        .panel-heading Bitcoin transactions
+        %table.table
+          %tr
+            %th From
+            %th Transaction
+            %th Amount
+          -@transaction.reference_transactions.each do |tx|
+            %tr
+              %td=tx.address
+              %td=link_to tx.tx_id, "https://blockchain.info/tx/#{tx.tx_id}"
+              %td=number_to_currency(tx.amount, unit: "฿")
+
+=content_for(:title) do
+  ="Mastercoin purchase offer from #{@transaction.address}"

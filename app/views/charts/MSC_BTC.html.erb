@@ -1,0 +1,30 @@
+<div id="graph-container" style="width:100%; height:400px;">
+</div>
+<script>
+  $(function() {
+
+    // Create the chart
+    $('#graph-container').highcharts('StockChart', {
+        chart: {
+            renderTo: 'container'
+        },
+
+        rangeSelector: {
+            selected: 1
+        },
+
+        title: {
+            text: 'MSC/BTC price chart'
+        },
+        
+        series: [{
+            name: 'MSC/BTC',
+            data: <%= raw PurchaseOffer.collect_data.to_json %>,
+            type: 'spline',
+            tooltip: {
+              valueDecimals: 2
+            }
+        }]
+    });
+  });
+</script>

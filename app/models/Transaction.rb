@@ -1,8 +1,10 @@
 class Transaction < ActiveRecord::Base
+  class CouldNotSaveTransactionException < StandardError;end;
 
   CURRENCIES = {
-    1 => "Mastercoin",
-    2 => "Test Mastercoin",
+    0 => "BTC",
+    1 => "MSC",
+    2 => "Test MSC",
   }
 
   acts_as_list column: :app_position
@@ -11,9 +13,20 @@ class Transaction < ActiveRecord::Base
   scope :test, -> { where(currency_id: 2) }
   scope :valid, -> { where(invalid_tx: false) }
 
-  default_scope { order('app_position DESC') } 
-
+  after_save :persist_address
   after_create :set_app_position!
+
+  def persist_address
+    begin
+      address = Address.find_or_initialize_by(name: self.address)
+      address.save
+
+      address = Address.find_or_initialize_by(name: self.receiving_address)
+      address.save
+    rescue ActiveRecord::StatementInvalid
+      Rails.logger.info("SOMETHING WENT WRONG WITH: #{self}")
+    end
+  end
 
   def set_app_position!
     # find the correct position
@@ -56,6 +69,14 @@ class Transaction < ActiveRecord::Base
     self.update_attribute(:invalid_tx, true)
   end
 
+  def self.reimport_last_transactions(amount = 100, offset = 0)
+    txouts = Mastercoin.storage.get_txouts_for_address(Mastercoin::EXODUS_ADDRESS)
+    txs = txouts.collect(&:get_tx)
+    txs[offset..offset+amount].each do |tx|
+      Transaction.insert_by_tx(tx.hash)
+    end
+  end
+
   # This won't work as long as we can't get the tx in the blockchain
   # We need the sender address to decode the message
   def self.insert_unconfirmed_by_tx(hash)
@@ -74,7 +95,8 @@ class Transaction < ActiveRecord::Base
   end
 
   def self.insert_by_tx(tx_hash)
-    Rails.logger.info "Looking up tx: #{tx_hash}"
+    translogger = Logger.new(Rails.root + 'log/transaction_import.log')
+    translogger.info "Looking up tx: #{tx_hash}"
     transaction = Mastercoin.storage.get_tx(tx_hash)
     position = Mastercoin.storage.get_idx_from_tx_hash(tx_hash)
     block = transaction.get_block
@@ -84,49 +106,61 @@ class Transaction < ActiveRecord::Base
 
     begin
       tx = Mastercoin::Transaction.new(transaction.hash)
-      Rails.logger.info "Found tx: #{tx} with type: #{tx.data.transaction_type.to_i.to_s}"
+      translogger.info "Found tx: #{tx} with #{tx.to_s} in block #{height}"
+      source_address = tx.source_address
+
       if tx.data.transaction_type.to_i.to_s == Mastercoin::TRANSACTION_SIMPLE_SEND
         unless SimpleSend.find_by(tx_id: transaction.hash).present?
-          Rails.logger.info "This is a Mastercoin transaction, do something #{tx_hash} for block #{height}"
-          unless a = SimpleSend.create(is_exodus: false, block_height: height, position: position, multi_sig: tx.multisig, address: tx.source_address, block_height: transaction.blk_id, receiving_address: tx.target_address, transaction_type: tx.data.transaction_type, currency_id: tx.data.currency_id, tx_id: transaction.hash, amount: tx.data.amount / 1e8, tx_date: Time.at(time))
-            raise "could not save: #{a.inspect}"
+          simple_send = SimpleSend.new(is_exodus: false, position: position, multi_sig: tx.multisig, receiving_address: tx.target_address, transaction_type: tx.data.transaction_type, currency_id: tx.data.currency_id, tx_id: transaction.hash, amount: tx.data.amount / 1e8, tx_date: Time.at(time))
+          simple_send.address = source_address
+          simple_send.block_height = height
+          unless simple_send.save
+            raise CouldNotSaveTransactionException.new "Could not save transaction: #{simple_send.inspect}"
           end
-        else
-          Rails.logger.info "SipmleSend transaction already present."
         end
       elsif tx.data.transaction_type.to_i.to_s == Mastercoin::TRANSACTION_SELL_FOR_BITCOIN.to_s
         unless SellingOffer.find_by(tx_id: transaction.hash).present?
-          unless a = SellingOffer.create(is_exodus: false, block_height: height, position: position, multi_sig: tx.multisig, address: tx.source_address, block_height: transaction.blk_id, transaction_type: tx.data.transaction_type, currency_id: tx.data.currency_id, tx_id: transaction.hash, amount: tx.data.amount.to_f / 1e8, amount_desired: tx.data.bitcoin_amount.to_f / 1e8, time_limit: tx.data.time_limit, required_fee: tx.data.transaction_fee.to_f / 1e8,  tx_date: Time.at(time))
-            raise "could not save: #{a.inspect}"
+          a = SellingOffer.new(is_exodus: false, position: position, multi_sig: tx.multisig, address: tx.source_address, transaction_type: tx.data.transaction_type, currency_id: tx.data.currency_id, tx_id: transaction.hash, amount: tx.data.amount.to_f / 1e8, amount_desired: tx.data.bitcoin_amount.to_f / 1e8, time_limit: tx.data.time_limit, required_fee: tx.data.transaction_fee.to_f / 1e8,  tx_date: Time.at(time))
+          a.block_height = height
+          unless a.save
+            raise CouldNotSaveTransactionException.new "Could not save transaction: #{a.inspect}"
           end
         else
-          Rails.logger.info "Selling offer transaction already present."
+          translogger.info "Selling offer transaction already present."
         end
       elsif tx.data.transaction_type.to_i.to_s == Mastercoin::TRANSACTION_PURCHASE_BTC_TRADE.to_s
         fee = transaction.in.map(&:get_prev_out).map(&:value).sum - transaction.out.map(&:value).sum
         unless PurchaseOffer.find_by(tx_id: transaction.hash).present?
-          unless a = PurchaseOffer.create(status: 0,is_exodus: false, block_height: height, position: position, multi_sig: tx.multisig, address: tx.source_address, block_height: transaction.blk_id, bitcoin_fee: fee, transaction_type: tx.data.transaction_type, receiving_address: tx.target_address, currency_id: tx.data.currency_id, tx_id: transaction.hash, amount: tx.data.amount.to_f / 1e8, tx_date: Time.at(time))
-            raise "could not save: #{a.inspect}"
+          a = PurchaseOffer.new(status: 0,is_exodus: false, position: position, multi_sig: tx.multisig, address: tx.source_address, bitcoin_fee: fee, transaction_type: tx.data.transaction_type, amount: 0, receiving_address: tx.target_address, currency_id: tx.data.currency_id, tx_id: transaction.hash, requested_amount: tx.data.amount.to_f / 1e8, tx_date: Time.at(time))
+          a.block_height = height
+          unless a.save
+            raise CouldNotSaveTransactionException.new "Could not save transaction: #{a.inspect}"
           end
         else
-          Rails.logger.info "Purchase offer transaction already present."
+          translogger.info "Purchase offer transaction already present."
         end
       else
         raise "We don't know this shit (#{tx.data.transaction_type.to_i.to_s}) #{tx.data.inspect}"
       end
     rescue Mastercoin::Transaction::NoMastercoinTransactionException => e
-      Rails.logger.info "Does not look like a mastercoin transaction. Must be exodus payment: #{e}"
+      translogger.info "Does not look like a mastercoin transaction. #{e}"
+    rescue CouldNotSaveTransactionException => e
+      ExceptionNotifier.notify_exception(e)
     rescue StandardError => e
-      Rails.logger.info "Other error found: #{e} #{tx_hash}"
-      Rails.logger.info "Backtrace: #{e.backtrace.join("\n")}"
+      translogger.info "Other error found: #{e} #{tx_hash}"
+      translogger.info "Backtrace: #{e.backtrace.join("\n")}"
+      ExceptionNotifier.notify_exception(e)
     ensure
+      # Rewrite this part plox
       if ExodusTransaction.find_by(tx_id: transaction.hash).present?
-        Rails.logger.info "Already have this tx. skipping"
+        translogger.info "Already have this tx. skipping"
       else
         info = Mastercoin::ExodusPayment.from_transaction(transaction.hash)
         if info.coins_bought.to_f > 0
-          a = ExodusTransaction.create(address: Mastercoin::EXODUS_ADDRESS, position: position, block_height: height, receiving_address: info.address, transaction_type: -1, currency_id: 1, tx_id: info.tx.hash, amount: info.total_amount, bonus_amount_included: info.bonus_bought, is_exodus: true, tx_date: Time.at(info.time_included.to_i))
-          Rails.logger.info "Added transaction #{a.id} #{a.tx_date}"
+          a = ExodusTransaction.new(address: Mastercoin::EXODUS_ADDRESS, position: position, receiving_address: info.address, transaction_type: -1, currency_id: 1, tx_id: info.tx.hash, amount: info.total_amount, bonus_amount_included: info.bonus_bought, is_exodus: true, tx_date: Time.at(info.time_included.to_i))
+          a.block_height = height
+          a.save
+          translogger.info "Added transaction #{a.id} #{a.tx_date}"
         end
       end #end if/else
     end #end being rescu
@@ -138,35 +172,47 @@ class Transaction < ActiveRecord::Base
     true
   end
 
-  # This is depcrecated; use sibling_validations instead
-  def had_funds?
-    balance_at = self.get_address.balance(self.currency_id, before_time: self.tx_date)
-    balance_at >= amount
-  end
-
   def get_address
-    Address.new(self.address)
-  end
+    address = Address.find_or_initialize_by(name: self.address)
+    address.save if address.new_record?
 
-  def load_transactions
-    get_address.load_from_options(self.currency_id, before_block: self.block_height)
+    return address
   end
 
   def balance
-    get_address.balance(self.currency_id, before_app_position: self.app_position)
+    balance_amount = get_address.calculate_balance(self.currency_id, before_app_position: self.app_position, exodus_time: self.tx_date, parent: self)
+    return balance_amount
   end
   
-  def self.calculate_balance(supplied_address)
+  def self.calculate_balance(supplied_address, options = {})
     transactions = order("app_position ASC")
-    Rails.logger.info(transactions.count)
+
+    # If we want to overwrite a previous selling order we shouldn't use the reserved balance before this block; but of this actual block.
+    if options[:parent] && options[:parent].type == "SellingOffer"
+      latest_selling_offer = options[:parent]
+    else
+      latest_selling_offer = transactions.where(type: "SellingOffer").order("app_position DESC").first
+    end
+
     balance = 0
+    reserved = 0
+
+    if options[:exodus_time]
+      if supplied_address == "1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P"
+        time_difference = (options[:exodus_time].to_i - Mastercoin::END_TIME.to_i) / 31556926.0
+        balance = ((1-(0.5**time_difference)) * BigDecimal.new("56316.23576222")).round(8)
+      end
+    end
 
     transactions.each do |transaction|
       if transaction.type == "ExodusTransaction"
-        balance += transaction.amount
+        unless supplied_address == "1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P"
+          balance += transaction.amount
+        end
       end
 
-      if transaction.type == "SimpleSend"
+      # The && Statement is to ignore transaction that send funds to themselves for balance calculations.
+      if transaction.type == "SimpleSend" && transaction.address != transaction.receiving_address
         if transaction.address == supplied_address
           balance -= transaction.amount
         else
@@ -174,21 +220,81 @@ class Transaction < ActiveRecord::Base
         end
       end
 
-      if transaction.type == "PurchaseOffer" && transaction.status == PurchaseOffer::STATUS_SEEN
+      #TODO: ADD THIS AGAIN
+      #if transaction.type == "SellingOffer"
+      #  # Only the latest open selling offer should be reserved, nothing else
+      #  if transaction.address == supplied_address && latest_selling_offer == transaction
+      #    balance -= transaction.amount
+      #    reserved += transaction.amount
+      #  end
+      #end
+
+      if transaction.type == "PurchaseOffer"
         if transaction.address == supplied_address 
-          balance += transaction.amount
+          balance += (transaction.amount || 0)
         else
-          balance -= transaction.amount
+          reserved -= (transaction.amount || 0)
         end
       end
     end
 
-    return balance
+    if options[:reserved]
+      return balance, reserved
+    else
+      return balance
+    end
   end
 
   def sibling_validations!
+    unless self.type == ExodusTransaction
+      self.validate_balance!
+    end
+
+    # Scans through the msc blockchain and flag every transaction we need to rescan
+    self.revalidate_children
+
+    # Now let's validate them all
+    validation_transactions = Transaction.where(revalidate: true)
+
+    Rails.logger.info("Revalidating #{validation_transactions.count} transactions")
+    # Let's do it!
+    validation_transactions.each(&:validate_balance!)
+  end
+
+  def validate_balance!
     if balance < self.amount
       self.mark_invalid!
     end
+    self.update_attributes(revalidate: false)
+
+    #TODO: HACK, THIS SHOULD BE REWRITTEN SOMEHOW
+    if self.type == "PurchaseOffer"
+      self.set_selling_offer_and_amount!
+      self.save
+    end
+  end
+
+  def revalidate_children
+    puts "SELFIE: #{self.address} - #{self.receiving_address}"
+    if self.type == "ExodusTransaction"
+      txs = Transaction.where("address = ?",self.receiving_address)
+    else
+      txs = Transaction.where("(address = ? AND type = 'SellingOffer') OR (address = ? AND type ='SimpleSend') OR (receiving_address = ? AND type = 'PurchaseOffer')", self.address, self.address, self.address)
+    end
+
+    txs.where("app_position > ?", self.app_position).order("app_position ASC").where(revalidate: false).each do |tx|
+      tx.update_attributes(invalid_tx: false, revalidate: true, status: 0)
+      tx.revalidate_children
+    end
+  end
+
+  def self.reimport!
+    order("app_position ASC").each(&:reimport!)
+  end
+
+  def reimport!
+    hash = self.tx_id
+    self.destroy
+    Transaction.insert_by_tx(hash)
   end
 end

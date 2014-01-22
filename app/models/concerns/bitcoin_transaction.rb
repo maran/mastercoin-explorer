@@ -74,7 +74,7 @@ module BitcoinTransaction
   def send_simple_send
     self.get_transactions
     self.calculate_fee
-    @data_keys = Mastercoin::SimpleSend.new(currency_id: 2, amount: self.amount.to_f * 1e8).encode_to_compressed_public_key(self.sending_address)
+    @data_keys = Mastercoin::SimpleSend.new(currency_id: self.currency_id, amount: self.amount.to_f * 1e8).encode_to_compressed_public_key(self.sending_address)
 
     send_tx
   end

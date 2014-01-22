@@ -4,6 +4,7 @@
 #
 # To use the locales, use `I18n.t`:
 #
+#
 #     I18n.t 'hello'
 #
 # In views, this is aliased to just `t`:
@@ -21,3 +22,9 @@
 
 en:
   hello: "Hello world"
+  number:
+    currency:
+      format:
+        unit: ""
+        precision: 8
+

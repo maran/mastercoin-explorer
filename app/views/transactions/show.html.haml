@@ -1,5 +1,5 @@
 %h2
-  Transaction information
+  Simple Send information
   %small=params[:id]
 
 .row
@@ -41,3 +41,5 @@
         %tr
           %th Is multisig Mastercoin
           %td=@transaction.multi_sig? ? "Yes" : "No"
+=content_for(:title) do
+  ="Mastercoin simple send from #{@transaction.address}"

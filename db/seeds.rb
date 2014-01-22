@@ -1,11 +1,3 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
-#
 so = SellingOffer.create(amount: 1000, required_fee: 0.0001,  time_limit: 10, amount_desired: 10, block_height: 10, position: 1, tx_date: Time.now - 5.days)
 so2 = SellingOffer.create(amount: 1000, required_fee: 0.0001, time_limit: 10, amount_desired: 15, block_height: 10, position: 1, tx_date: Time.now - 5.days)
 so3 = SellingOffer.create(amount: 1000, required_fee: 0.0001, time_limit: 10, amount_desired: 20, block_height: 10, position: 1, tx_date: Time.now - 5.days)

@@ -2,3 +2,5 @@
   .col-md-12
     %h2 Invalid mastercoin transactions
     =render partial: "/transactions/transactions", locals: {transactions: @transactions, short: false}
+=content_for(:title) do
+  Mastercoin transaction overview

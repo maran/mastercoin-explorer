@@ -2,6 +2,7 @@ RailsMastercoin::Application.routes.draw do
   get "charts/weekly"
   get "charts/yearly"
   get "charts/monthly"
+  get "charts/MSC_BTC"
   resources :homes
 
   resources :transactions
@@ -48,6 +49,7 @@ RailsMastercoin::Application.routes.draw do
   end
 
   resources :selling_offers
+  resources :simple_sends
   resources :purchase_offers
   resources :order_books
   resources :advisors

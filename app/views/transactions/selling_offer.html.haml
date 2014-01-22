@@ -1,3 +1,7 @@
+%h2
+  Selling Offer information
+  %small=params[:id]
+
 .row
   .col-md-6
     .panel.panel-default
@@ -8,16 +12,19 @@
           %td=link_to @transaction.address, address_path(@transaction.address)
         %tr
           %th Price per coin
-          %td=@transaction.price_per_coin
+          %td=number_to_currency(@transaction.price_per_coin, unit: "฿")
         %tr
           %th Amount
           %td=@transaction.amount
         %tr
+          %th Amount available
+          %td=@transaction.amount_available
+        %tr
           %th Bitcoin amount desired
-          %td=@transaction.amount_desired
+          %td=number_to_currency(@transaction.amount_desired, unit: "฿")
         %tr
           %th Fee required
-          %td=@transaction.required_fee
+          %td=number_to_currency(@transaction.required_fee, unit: "฿")
         %tr
           %th Block time limit
           %td=@transaction.time_limit
@@ -51,11 +58,15 @@
         .panel-heading Bids on this offer
         %table.table
           %tr
-            %th Amount
+            %th Transaction
+            %th Amount bought
             %th Status
             %th Date
-          -@transaction.purchase_offers.each do |offer|
+            %th Block
+          -@transaction.purchase_offers.order("app_position DESC").each do |offer|
             %tr
+              %td=link_to truncate(offer.tx_id), transaction_path(offer.tx_id)
               %td=offer.amount
-              %td=offer.status_text
+              %td{class: offer.status_class}=offer.status_text
               %td=offer.tx_date
+              %td=offer.block_height

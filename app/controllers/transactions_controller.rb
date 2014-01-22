@@ -1,8 +1,9 @@
 class TransactionsController < ApplicationController
   def show
     @transaction = Transaction.where(tx_id: params[:id]).first
-    unless @transaction
+    if @transaction.nil? || @transaction.type.nil?
       redirect_to root_path, notice: "Could not find transaction with transaction id #{params[:id]}"
+      return
     end
 
     if ["SimpleSend", "ExodusPayment"].include?(@transaction.type)

@@ -5,26 +5,27 @@
         Distributed order book
       .panel-body
         %p Here you will see the broadcasted distributed Mastercoin orders for sale using the Mastercoin protocol itself.
-      %table.table
+      %table.table.table-condensed
         -if @offers.find_all{|x| x.amount_available > 0}.any?
           %tr
+            %th
             %th Seller
-            %th Price per coin
+            %th Unit price
             %th Units available
             %th Bitcoin desired
             %th Time limit
-            %th Transaction fee required
+            %th Fee required
             %th Currency
             %th Actions
           -@offers.each do |offer|
             -next if offer.amount_available <= 0
             %tr
+              %td=link_to image_tag('details.png'), transaction_path(offer.tx_id), :"data-toggle" => :tooltip, title: offer.tx_id, class: "transaction-tooltip", :"data-placement" => "right"
               %td=link_to offer.address, address_path(offer.address)
-              %td=offer.price_per_coin
+              %td=number_to_currency(offer.price_per_coin, unit: "฿")
               %td
-                =offer.amount_available 
-                = "(#{offer.amount})"
-              %td=offer.amount_desired
+                =number_to_currency(offer.amount_available)
+              %td=number_to_currency(offer.amount_desired, unit: "฿")
               %td=offer.time_limit
               %td=offer.required_fee
               %td=offer.currency
@@ -33,23 +34,55 @@
           %tr
             %td{colspan: 8} No open orders
 .row
-  .col-md-12
+  .col-md-6
     .panel.panel-default
       .panel-heading 
-        Recent currency transactions
+        MSC/BTC Chart
+      #graph-container
+
+  .col-md-6
+    .panel.panel-default
+      .panel-heading 
+        Accepted distributed exchange transactions
       .panel-body
         %p Here is a list of recent bought transactions that were bought via the distributed system.
       %table.table
         %tr
-          %th Seller
-          %th Buyer
-          %th Price per coin
+          %th Transaction
+          %th Unit price
           %th Amount
           %th Currency
-        -PurchaseOffer.accepted.valid.each do |offer|
+        -PurchaseOffer.valid.accepted.limit(8).each do |offer|
           %tr
-            %td=link_to offer.selling_offer.address, address_path(offer.selling_offer.address)
-            %td=link_to offer.address, address_path(offer.address)
-            %td=offer.selling_offer.price_per_coin
+            %td=link_to truncate(offer.tx_id), transaction_path(offer.tx_id)
+            %td=number_to_currency(offer.selling_offer.price_per_coin, unit: "฿")
             %td=offer.amount
             %td=offer.currency
+:javascript
+  $(function() {
+    // Create the chart
+    $('#graph-container').highcharts('StockChart', {
+        chart: {
+            renderTo: 'container'
+        },
+
+        rangeSelector: {
+            selected: 1
+        },
+
+        title: {
+            text: 'MSC/BTC price chart'
+        },
+        
+        series: [{
+            name: 'MSC/BTC',
+            data: #{raw PurchaseOffer.collect_data.to_json},
+            type: 'spline',
+            tooltip: {
+              valueDecimals: 2
+            }
+        }]
+    });
+  });
+=content_for(:title) do
+  Mastercoin distributed exchange order book

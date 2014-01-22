@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.0.0'
-gem 'mastercoin-ruby', :git => "https://github.com/maran/mastercoin-ruby.git", branch: "develop"
+gem 'mastercoin-ruby', '0.2.9'
 gem 'bitcoin-ruby', '~> 0.0.2', :git => "https://github.com/lian/bitcoin-ruby.git"
 gem 'sequel'
 gem 'pg'
@@ -21,6 +21,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 2.0'
   gem 'database_cleaner', '<1.1.0'
   gem "factory_girl_rails", "~> 4.0"
+  gem 'pry'
 end
 
 # Use sqlite3 as the database for Active Record

@@ -1,0 +1,6 @@
+%h2 Simple send
+%p Your transaction has been build. You can now use your private key from your client to sign the transaction.
+%p Always decode the transaction first to make sure the transaction is created the way you wanted it.
+%textarea{style: "width:100%; height: 150px"}=@simple_send.transaction_hash
+
+%p=link_to "Need help broadcasting this transaction?", "/help"

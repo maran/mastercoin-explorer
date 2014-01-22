@@ -1,10 +1,30 @@
 class SimpleSend < Transaction
+  include BitcoinTransaction
+
+  validates :amount, presence: true, numericality: {greater_than: 0}
+  validates :receiving_address, presence: true
+  validates :currency_id, presence: true
+
   # TODO: Add a function to check if the same block has multiple txes and use position to determine the winner
   # TODO: Create specs
   # 1. Check if funds were present at the time; ignore if not but make sure a next payment should work
   # 2. Check if multiple payments in the same block were made that would throw balance in the minus
   after_create :check_transaction_validity
   
+  def has_funds?
+    self.calculate_fee
+    self.get_transactions
+
+    if self.outputs.blank?
+      errors.add(:public_key, "You don't have any Bitcoin funds on your Mastercoin address. Transactions can not be created.")
+      return false
+    elsif self.outputs.find{|x| BigDecimal.new(x["value"]) > (@fee + @mastercoin_tx)}.blank?
+      errors.add(:public_key, "You don't have a big enough output available to create this transaction. Please consolidate some coins and send them to your Mastercoin address.")
+      return false
+    end
+    return true
+  end
+
   def refresh!
     self.block_height = raw_tx.get_block.depth
     self.tx_date = Time.at(raw_tx.get_block.time)
@@ -23,7 +43,7 @@ class SimpleSend < Transaction
       
       start_date = Date.today
       end_date = start_date-x.day
-      amount = SimpleSend.where("tx_date BETWEEN ? AND ?", end_date, end_date + 1.day).sum(:amount)
+      amount = SimpleSend.where("tx_date BETWEEN ? AND ?", end_date, end_date + 1.day).where(currency_id: 1).sum(:amount)
       x += 1
       amount.to_f
     end
@@ -49,7 +69,7 @@ class SimpleSend < Transaction
       x += 1
       start_date = Date.parse("2013-#{x.to_s.rjust(2,'0')}-01")
       end_date = start_date.end_of_month
-      amount = SimpleSend.where("tx_date BETWEEN ? AND ?", start_date, end_date).sum(:amount)
+      amount = SimpleSend.where("tx_date BETWEEN ? AND ?", start_date, end_date).where(currency_id: 1).sum(:amount)
       amount.to_f
     end
     { name: 'Simple Send', data: amount_transferred }
@@ -72,7 +92,7 @@ class SimpleSend < Transaction
       
       start_date = Date.today
       end_date = start_date-x.day
-      amount = SimpleSend.where("tx_date BETWEEN ? AND ?", end_date, end_date + 1.day).sum(:amount)
+      amount = SimpleSend.where("tx_date BETWEEN ? AND ?", end_date, end_date + 1.day).where(currency_id: 1).sum(:amount)
       x += 1
       amount.to_f
     end

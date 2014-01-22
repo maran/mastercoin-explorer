@@ -1,6 +1,6 @@
 %h1
   Address information 
-  %small=@address.address
+  %small=@address.name
 .row
   .col-md-6
     .panel.panel-default
@@ -13,29 +13,33 @@
         %tr
           %th Final balance
           %td
-            = number_to_currency(@address.balance(1), unit: "")
+            = number_to_currency(@address.balance)
           %td 
-            =number_to_currency(@address.balance(2), unit: "")
+            =number_to_currency(@address.test_balance)
+        %tr
+          %th Reserved
+          %td=number_to_currency(@address.reserved_balance)
+          %td=number_to_currency(@address.reserved_test_balance)
         %tr
           %th Bought via Exodus
-          %td=@address.exodus_payments(1).sum(:amount)
-          %td=@address.exodus_payments(2).sum(:amount)
+          %td=number_to_currency @address.exodus_transactions.real.sum(:amount)
+          %td=number_to_currency @address.exodus_transactions.test.sum(:amount)
         %tr
           %th Payments received
-          %td= @address.received(1).sum(:amount)
-          %td= @address.received(2).sum(:amount)
+          %td=number_to_currency @address.received_transactions.valid.real.sum(:amount)
+          %td=number_to_currency @address.received_transactions.valid.test.sum(:amount)
         %tr
           %th Payments sent
-          %td= @address.sent(1).sum(:amount)
-          %td= @address.sent(2).sum(:amount)
+          %td=number_to_currency @address.sent_transactions.valid.real.sum(:amount)
+          %td=number_to_currency @address.sent_transactions.valid.test.sum(:amount)
         %tr
           %th Coins bought
-          %td= @address.bought(1).sum(:amount)
-          %td= @address.bought(2).sum(:amount)
+          %td=number_to_currency @address.bought.real.sum(:amount)
+          %td=number_to_currency @address.bought.test.sum(:amount)
         %tr
           %th Coins sold
-          %td= @address.sold(1).sum(:amount)
-          %td= @address.sold(2).sum(:amount)
+          %td=number_to_currency @address.sold.real.sum(:amount)
+          %td=number_to_currency @address.sold.test.sum(:amount)
   .col-md-6
     .panel.panel-default
       .panel-heading Other information
@@ -47,27 +51,27 @@
         %tr
           %th Exodus transactions
           %td
-            %span.badge= @address.exodus_payments(1).count
+            %span.badge= @address.exodus_transactions.real.count
           %td
-            %span.badge= @address.exodus_payments(2).count
+            %span.badge= @address.exodus_transactions.test.count
         %tr
           %th Incoming transactions
           %td
-            %span.badge= @address.received(1).count
+            %span.badge= @address.received_transactions.real.count
           %td
-            %span.badge= @address.received(2).count
+            %span.badge= @address.received_transactions.test.count
         %tr
           %th Outoing transactions
           %td
-            %span.badge= @address.sent(1).count
+            %span.badge= @address.sent_transactions.real.count
           %td
-            %span.badge= @address.sent(2).count
+            %span.badge= @address.sent_transactions.test.count
 
--if @exodus_payments.present?
+-if @address.exodus_transactions.present?
   .panel.panel-default
     .panel-heading 
       Exodus transactions
-      ="(#{@exodus_payments.count})"
+      ="(#{@address.exodus_transactions.count})"
     %table.table
       %thead
         %th Transaction ID
@@ -75,7 +79,7 @@
         %th Amount
         %th Bonus
         %th Date
-      -@exodus_payments.each do |payment|
+      -@address.exodus_transactions.each do |payment|
         %tr
           %td=link_to truncate(payment.tx_id, length: 15), transaction_path(payment.tx_id)
           %td=payment.currency
@@ -88,6 +92,7 @@
       Sold coins
       ="(#{@address.sold.count})"
     =render partial: "/transactions/transactions", locals: {transactions: @address.sold}
+
 -if @address.bought.present?
   .panel.panel-default
     .panel-heading 
@@ -95,24 +100,24 @@
       ="(#{@address.bought.count})"
     =render partial: "/transactions/transactions", locals: {transactions: @address.bought}
 
--if @selling_offers.present?
+-if @address.selling_offers.present?
   .panel.panel-default
     .panel-heading 
       Selling Offers
-      ="(#{@selling_offers.count})"
-    =render partial: "/transactions/transactions", locals: {transactions: @selling_offers}
+      ="(#{@address.selling_offers.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @address.selling_offers}
 
--if @received_payments.present?
+-if @address.received_transactions.present?
   .panel.panel-default
     .panel-heading 
       Received transactions
-      ="(#{@received_payments.count})"
-    =render partial: "/transactions/transactions", locals: {transactions: @received_payments, short: false}
+      ="(#{@address.received_transactions.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @address.received_transactions, short: false}
 
--if @sent.present?
+-if @address.sent_transactions.present?
   .panel.panel-default
     .panel-heading
       Sent transactions
-      ="(#{@sent.count})"
-    =render partial: "/transactions/transactions", locals: {transactions: @sent, short: false}
+      ="(#{@address.sent_transactions.count})"
+    =render partial: "/transactions/transactions", locals: {transactions: @address.sent_transactions, short: false, show_target: true}
 

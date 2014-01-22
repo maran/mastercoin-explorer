@@ -9,4 +9,7 @@ class ChartsController < ApplicationController
   def weekly
   end
 
+  def MSC_BTC
+  end
+
 end

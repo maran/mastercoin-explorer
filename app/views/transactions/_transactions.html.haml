@@ -1,7 +1,10 @@
 %table.table
   %thead
     %th Transaction ID
-    %th Source address
+    -if defined?(show_target)
+      %th Recipient address
+    -else
+      %th Source address
     %th Currency
     %th Amount
     %th Type
@@ -10,7 +13,10 @@
   -transactions.each do |payment|
     %tr
       %td=link_to truncate(payment.tx_id, length: 15), transaction_path(payment.tx_id)
-      %td=link_to payment.address, address_path(payment.address)
+      -if defined?(show_target)
+        %td=link_to payment.receiving_address, address_path(payment.receiving_address)
+      -else
+        %td=link_to payment.address, address_path(payment.address)
       %td=payment.currency
       %td=payment.amount
       %td=payment.kind

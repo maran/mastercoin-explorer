@@ -1,18 +1,19 @@
 class SellingOffer < Transaction
   include BitcoinTransaction
+  STATUS_ONLY_TEST_ALLOWED = -4
 
-  has_many :purchase_offers, foreign_key: :reference_transaction_id
-  before_save :set_price_per_coin
-  after_create :set_current
+  has_many :purchase_offers, dependent: :destroy
+  before_create :set_price_per_coin
+  after_create :only_allow_test, :check_transaction_validity
 
   attr_accessor :public_key
 
-  #validates :amount, presence: true, numericality: {greater_than: 0}
-  #validates :amount_desired, presence: true, numericality: {greater_than: 0}
-  #validates :required_fee, presence: true, numericality: {greater_than_or_equal_to: 0}
-  #validates :time_limit, presence: true, numericality: {greater_than: 0}
+  validates :amount, presence: true, numericality: true
+  validates :amount_desired, presence: true, numericality: true
+  validates :required_fee, presence: true, numericality: true
+  validates :time_limit, presence: true, numericality: {greater_than: 0}
 
-  scope :current, -> { where(current: true).limit(1) }
+  scope :current, -> { order("app_position DESC").limit(1).first }
   scope :height_and_address, -> height, address { where("block_height < ? AND address = ?", height, address).order("block_height DESC").valid }
   scope :in_block_for_address, -> height, address { where("block_height = ? AND address =?", height, address).order("position ASC").valid }
   scope :before_position, -> position { where("position < ?", position) }
@@ -20,6 +21,12 @@ class SellingOffer < Transaction
   def as_json(options = {})
     options.reverse_merge!(methods: [:amount_available, :amount_bought])
     super(options)
+  end
+
+  def only_allow_test
+    if self.currency_id == 1 # Only allow test Coins for now
+      self.update_attributes(invalid_tx: true, status: STATUS_ONLY_TEST_ALLOWED)
+    end
   end
 
   def has_funds?
@@ -36,8 +43,24 @@ class SellingOffer < Transaction
     return true
   end
 
-  def amount_available
-    amount_for_sale = self.amount - self.amount_bought
+  def amount_available(app_position = nil)
+    txs = self.purchase_offers.valid.where("status = ?", PurchaseOffer::STATUS_OPEN)
+
+    if app_position.present?
+      txs = txs.where("app_position < ? ", app_position)
+    end
+
+    available = self.amount - txs.sum(:accepted_amount)
+
+    txs = self.purchase_offers.valid.where("status = ?", PurchaseOffer::STATUS_CLOSED)
+    if app_position.present?
+      txs = txs.where("app_position < ? ", app_position)
+    end
+
+    available = available - txs.sum(:amount)
+      
+    return 0 if available < 0
+    available
   end
 
   def amount_bought
@@ -48,12 +71,7 @@ class SellingOffer < Transaction
     self.price_per_coin = (1 / self.amount)  * self.amount_desired
   end
 
-  # This is only used on our frontpage, should not be used for matching orders
-  def set_current
-    offers = SellingOffer.where(address: self.address).where(currency_id: self.currency_id).valid.order("tx_date DESC, position DESC")
-    current_offer = offers.first
-    if offers.update_all(current: false)
-      current_offer.update_attributes(current: true)
-    end
+  def other_offers
+    SellingOffer.where(address: self.address).where(currency_id: self.currency_id).valid
   end
 end

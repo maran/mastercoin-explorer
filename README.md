@@ -1,3 +1,6 @@
+## Warning ##
+This is not production ready. This is a centralised solution and is updated daily. Do not use :)
+
 ## Mastercoin-explorer ##
 This is a rails project that parses and saves Mastercoin data. You can see it working on [mastercoin-explorer.com](http://mastercoin-explorer.com).
 

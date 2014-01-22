@@ -2,8 +2,8 @@ FactoryGirl.define do
   factory :purchase_offer do
     address "2VV1234pyQpW3sqZbfAWhSRiVeeN552BXQ"
     receiving_address "1KA9SV5pyqpW3sqZbfAWhSRiVeeN552BXQ"
-    currency_id 1
-    amount 10
+    currency_id 2
+    requested_amount 10
     tx_date "2013-09-01 23:39:30"
     block_height 16
     position 5
@@ -13,7 +13,7 @@ FactoryGirl.define do
 
   factory :selling_offer do
     address "1KA9SV5pyqpW3sqZbfAWhSRiVeeN552BXQ"
-    currency_id 1
+    currency_id 2
     amount 10
     tx_date "2013-09-01 23:39:30"
     block_height 15
@@ -27,7 +27,7 @@ FactoryGirl.define do
     address "1EXoDusjGwvnjZUyKkxZ4UHEf77z6A5S4P"
     receiving_address "1KA9SV5pyqpW3sqZbfAWhSRiVeeN552BXQ"
     transaction_type -1
-    currency_id 1
+    currency_id 2
     is_exodus true
     amount 10
     bonus_amount_included 1
@@ -41,7 +41,7 @@ FactoryGirl.define do
     address "1KA9SV5pyqpW3sqZbfAWhSRiVeeN552BXQ"
     receiving_address "1Cu3gkevrm5bAJAWabwiWMWw8DsVujDbMD"
     transaction_type 0
-    currency_id 1
+    currency_id 2
     amount 10
     tx_date "2013-08-01 23:39:30"
     block_height 5
@@ -52,7 +52,7 @@ FactoryGirl.define do
     address "1Cu3gkevrm5bAJAWabwiWMWw8DsVujDbMD"
     receiving_address "1KA9SV5pyqpW3sqZbfAWhSRiVeeN552BXQ"
     transaction_type 0
-    currency_id 1
+    currency_id 2
     amount 10
     tx_date "2013-08-01 23:39:30"
     block_height 5
